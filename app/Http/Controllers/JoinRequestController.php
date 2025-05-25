@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Reservation;
+use App\Models\JoinRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
 
 class JoinRequestController extends Controller
 {
@@ -18,7 +22,7 @@ class JoinRequestController extends Controller
 
         // ایجاد درخواست الحاق
         JoinRequest::create([
-            'user_id' => auth()->id(),
+            'user_id' => auth()->id,
             'reservation_id' => $reservationId,
             'status' => 'pending',
         ]);
