@@ -24,6 +24,7 @@ class RegisterController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
+            'student_number' => 'required|string|max:20|unique:users',
             'phone' => User::rules(),
             'password' => 'required|string|min:8|confirmed',
         ]);
@@ -32,6 +33,7 @@ class RegisterController extends Controller
         User::create([
             'name' => $data['name'],
             'email' => $data['email'],
+            'student_number' => $data['student_number'],
             'phone' => $data['phone'],
             'password' => Hash::make($data['password']),
             'role' => 'user'
@@ -40,4 +42,6 @@ class RegisterController extends Controller
         
         return redirect()->route('home')->with('success', 'ثبت‌نام شما با موفقیت انجام شد.');
     }
+
+    
 }

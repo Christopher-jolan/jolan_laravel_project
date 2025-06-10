@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">   
     <title>@yield('title') | سیستم نوبت‌دهی سالن ورزشی</title>
     
     <!-- استایل‌های مشترک -->
@@ -155,6 +156,7 @@
     <!-- محتوای صفحه -->
     <div class="container">
         @yield('content')
+        @yield('scripts')
     </div>
     
     <!-- فوتر مشترک -->
@@ -171,8 +173,11 @@
     <!-- اسکریپت‌ها -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
     <script>
+        console.log('Form element:', document.getElementById('joinRequestForm'));
+        console.log('Button element:', document.getElementById('submitBtn'));
+    </script>
+<script>
     function confirmLogout(e) {
         e.preventDefault();
         Swal.fire({
@@ -195,8 +200,48 @@
             }
         });
     }
-    </script>
+
+        // مطمئن شوید این کد در انتهای صفحه و قبل از بسته شدن تگ </body> قرار دارد
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('joinRequestForm');
+    const btn = document.getElementById('submitBtn');
     
-    @stack('scripts')
+    if (!form || !btn) {
+        console.error('خطا: فرم یا دکمه پیدا نشد!');
+        console.log('فرم:', form);
+        console.log('دکمه:', btn);
+        return;
+    }
+    
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            console.log('فرم در حال ارسال...');
+            
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> در حال ارسال...';
+            
+            // برای دیباگ
+            console.log('وضعیت دکمه:', btn.disabled);
+            console.log('محتویات دکمه:', btn.innerHTML);
+            
+            // ارسال واقعی فرم
+            this.submit();
+        });
+    });
+ </script>
+ <script>
+document.getElementById('joinRequestForm').addEventListener('submit', function(e) {
+    const btn = document.getElementById('submitBtn');
+    console.log('Before:', btn.disabled, btn.innerHTML);
+    
+    btn.disabled = true;
+    btn.innerHTML = 'در حال ارسال...';
+    
+    console.log('After:', btn.disabled, btn.innerHTML);
+    return true; // اجازه دهید فرم ارسال شود
+});
+</script>
+    
+@stack('scripts')
 </body>
 </html>

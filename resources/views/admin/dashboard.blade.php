@@ -79,6 +79,12 @@
                         <label class="form-label">ظرفیت</label>
                         <input type="number" name="max_capacity" class="form-control" min="1" required>
                     </div>
+                    <div class="col-md-3">
+                        <div class="form-check mt-4 bg-light p-3 rounded ">
+                            <input type="checkbox" name="repeat_weekly" id="repeat_weekly" class="form-check-input" value="1">
+                            <label for="repeat_weekly" class="form-check-label">تکرار هفتگی</label>
+                        </div>
+                    </div>
                     <div class="col-md-3 d-flex align-items-end">
                         <button type="submit" class="btn btn-success">
                             <i class="bi bi-plus"></i> افزودن سانس

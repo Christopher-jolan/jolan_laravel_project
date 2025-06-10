@@ -10,10 +10,11 @@ class JoinRequest extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
-        'reservation_id',
-        'status',
-    ];
+    'user_id',
+    'reservation_id',
+    'status',
+    'message'
+];
 
     
     public function user()

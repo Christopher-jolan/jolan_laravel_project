@@ -4,6 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Team;
+use App\Models\TeamMember;
+use App\Models\GymSession;
+use App\Models\User;
 
 class Reservation extends Model
 {
@@ -22,31 +26,35 @@ class Reservation extends Model
         'status' => 'string'
     ];
 
+    public function team()
+    {
+        return $this->belongsTo(Team::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function gymSession()
+    {
+        return $this->belongsTo(GymSession::class);
+    }
+
+    public function members()
+    {
+        return $this->hasMany(TeamMember::class);
+    }
+
+    public function joinRequests()
+    {
+        return $this->hasMany(JoinRequest::class);
+    }
+
     public function getMembersCountAttribute()
     {
         // اگر تیم دارد تعداد اعضای تیم را برگردان
         // اگر تیم ندارد (رزرو انفرادی) عدد 1 را برگردان
         return $this->team ? $this->team->member_count : 1;
     }
-
-    public function members()
-    {
-        return $this->hasMany(TeamMember::class, 'team_id', 'team_id');
-    }
-
-    public function team()
-    {
-        return $this->belongsTo(Team::class);
-    }
-    
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
-
-    
-    public function gymSession()
-{
-    return $this->belongsTo(GymSession::class, 'gym_session_id');
-}
 }

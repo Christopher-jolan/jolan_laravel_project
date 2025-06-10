@@ -156,6 +156,16 @@
                             <span class="validation-error">{{ $message }}</span>
                         @enderror
                     </div>
+
+                    <div class="mb-3">
+                        <label for="student_number" class="form-label">شماره دانشجویی</label>
+                        <input type="text" class="form-control @error('student_number') is-invalid @enderror" 
+                            id="student_number" name="student_number" 
+                            value="{{ old('student_number') }}" required>
+                        @error('student_number')
+                            <span class="validation-error">{{ $message }}</span>
+                        @enderror
+                    </div>
                     
                     <div class="mb-3">
                         <label for="email" class="form-label">ایمیل</label>
@@ -175,7 +185,7 @@
                             <span class="validation-error">{{ $message }}</span>
                         @enderror
                     </div>
-                    
+
                     <div class="mb-3 position-relative">
                         <label for="password" class="form-label">رمز عبور</label>
                         <input type="password" class="form-control @error('password') is-invalid @enderror" id="password" name="password" required>

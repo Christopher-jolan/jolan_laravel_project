@@ -8,11 +8,17 @@
             @foreach ($gymSessions as $session)
                 @php
                     $totalReserved = 0;
-                    foreach($session->reservations as $reservation) {
-                        $totalReserved += $reservation->member_count;
+                    $reservationOwner = null;
+                    
+                    if($session->reservations->count() > 0) {
+                        foreach($session->reservations as $reservation) {
+                            $totalReserved += $reservation->member_count;
+                            $reservationOwner = $reservation->user_id;
+                        }
                     }
                     
                     $isFull = $totalReserved >= $session->max_capacity;
+                    $remainingCapacity = $session->max_capacity - $totalReserved;
                 @endphp
 
                 <div class="card {{ $isFull ? 'bg-light' : '' }}">
@@ -31,6 +37,9 @@
                             <p class="mb-1">
                                 <i class="bi bi-people-fill"></i> 
                                 ظرفیت: {{ $totalReserved }}/{{ $session->max_capacity }}
+                                @if(!$isFull)
+                                    ({{ $remainingCapacity }} ظرفیت خالی)
+                                @endif
                             </p>
                             
                             @if($session->reservations->count() > 0)
@@ -44,25 +53,28 @@
                                 </p>
                             @endif
                         </div>
-
                         @auth
-                            @if(!$isFull)
-                                <div class="d-flex gap-2">
-                                    <form action="{{ route('reservations.store', $session->id) }}" method="POST">
-                                        @csrf
-                                        <button type="submit" class="btn btn-primary">
-                                            <i class="bi bi-calendar-plus"></i> رزرو سانس
-                                        </button>
-                                    </form>
-                                    
-                                    <a href="{{ route('sessions.show', $session->id) }}" class="btn btn-outline-success">
-                                        <i class="bi bi-plus-circle"></i> الحاق به سانس
+                            @if($session->status !== 'full')
+                                @if($session->reservations->count() > 0)
+                                    @if($session->reservations->first()->user_id == auth()->id())
+                                        {{-- کاربر مالک رزرو است --}}
+                                        <a href="{{ route('reservations.show', $session->reservations->first()->id) }}" class="btn btn-info">
+                                            <i class="bi bi-people"></i> مدیریت تیم
+                                        </a>
+                                   @else
+                                        {{-- سانس توسط کاربر دیگری رزرو شده و ظرفیت دارد --}}
+                                        <a href="{{ route('join-requests.create', $session->reservations->first()->id) }}" class="btn btn-success">
+                                            <i class="bi bi-plus-circle"></i> الحاق به تیم
+                                        </a>
+                                    @endif
+                                @else
+                                    {{-- سانس رزرو نشده است --}}
+                                    <a href="{{ route('reservations.create', $session->id) }}" class="btn btn-primary">
+                                        رزرو این سانس
                                     </a>
-                                </div>
+                                @endif
                             @else
-                                <div class="auth-message">
-                                    <i class="bi bi-info-circle"></i> این سانس تکمیل ظرفیت شده است.
-                                </div>
+                                <button class="btn btn-secondary" disabled>تکمیل ظرفیت</button>
                             @endif
                         @else
                             <div class="auth-message">

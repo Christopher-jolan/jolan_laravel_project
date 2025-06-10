@@ -55,7 +55,12 @@ use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\GymSessionController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\JoinRequestController;
 use App\Http\Middleware\AdminMiddleware;
+
+use App\Http\Controllers\TeamController;
+use App\Http\Controllers\TeamMemberController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 // صفحه اصلی
@@ -100,6 +105,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 // مسیرهای ادمین
 Route::prefix('admin')->middleware(['auth', AdminMiddleware::class])->group(function () {
 
+    Route::post('/announcements', [AdminController::class, 'addAnnouncement'])->name('admin.announcements.add');
+    Route::delete('/announcements/{id}', [AdminController::class, 'deleteAnnouncement'])->name('admin.announcements.delete');
+
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     Route::post('/reservations/{id}/approve', [AdminController::class, 'approveReservation'])->name('admin.reservations.approve');
     Route::post('/reservations/{id}/reject', [AdminController::class, 'rejectReservation'])->name('admin.reservations.reject');
@@ -107,6 +115,30 @@ Route::prefix('admin')->middleware(['auth', AdminMiddleware::class])->group(func
     Route::delete('/sessions/{id}', [AdminController::class, 'deleteSession'])->name('admin.sessions.delete');
     Route::post('/announcements', [AdminController::class, 'addAnnouncement'])->name('admin.announcements.add');
     Route::delete('/announcements/{id}', [AdminController::class, 'deleteAnnouncement'])->name('admin.announcements.delete');
+});
+
+Route::middleware(['auth'])->group(function () {
+
+    Route::get('/join-requests/{reservation}/create', [JoinRequestController::class, 'create'])
+         ->name('join-requests.create');
+         
+    // تغییر از {reservation} به {reservationId} برای تطابق با کنترلر
+    Route::post('/join-requests/{reservationId}', [JoinRequestController::class, 'store'])
+         ->name('join-requests.store');
+    
+    // رزرو سانس
+    Route::get('/sessions/{gymSession}/reserve', [ReservationController::class, 'create'])
+        ->name('reservations.create');
+    Route::post('/sessions/{gymSession}/reserve', [ReservationController::class, 'store'])
+        ->name('reservations.store');
+
+    // مدیریت رزروها
+    Route::get('/reservations', [ReservationController::class, 'index'])->name('reservations.index');
+    Route::get('/reservations/{reservation}', [ReservationController::class, 'show'])->name('reservations.show');
+    Route::get('/reservations/{reservation}/edit', [ReservationController::class, 'edit'])->name('reservations.edit');
+    Route::put('/reservations/{reservation}', [ReservationController::class, 'update'])->name('reservations.update');
+    Route::patch('/reservations/{reservation}/cancel', [ReservationController::class, 'cancel'])->name('reservations.cancel');
+    Route::delete('/reservations/{reservation}', [ReservationController::class, 'destroy'])->name('reservations.destroy');
 });
 
 require __DIR__.'/auth.php';

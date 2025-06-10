@@ -17,6 +17,7 @@ class User extends Authenticatable
         'phone',
         'password',
         'role',
+        'student_number',
     ];
 
     protected $hidden = [
@@ -46,6 +47,7 @@ class User extends Authenticatable
             ],
             'password' => 'required|string|min:8|confirmed',
             'role' => 'sometimes|in:admin,user',
+            'student_number' => 'required|string|size:10|unique:users,student_number,'.$userId,
         ];
     }
 
@@ -57,5 +59,38 @@ class User extends Authenticatable
     public function isUser()
     {
         return $this->role === 'user';
+    }
+
+     public function teams()
+    {
+        return $this->belongsToMany(Team::class, 'team_members', 'user_id', 'team_id')
+            ->withPivot('role')
+            ->withTimestamps();
+    }
+
+    /**
+     * تیم‌هایی که کاربر مالک آن‌هاست (رهبر تیم است)
+     */
+    public function ownedTeams()
+    {
+        return $this->hasMany(Team::class, 'leader_id');
+    }
+
+    /**
+     * دریافت تمام تیم‌های مرتبط با کاربر (هم به عنوان عضو و هم به عنوان رهبر)
+     */
+    public function allTeams()
+    {
+        return Team::where('leader_id', $this->id)
+            ->orWhereHas('members', function($query) {
+                $query->where('user_id', $this->id);
+            })
+            ->get();
+    }
+
+    public function canCreateTeam()
+    {
+        // مثلاً محدودیت ایجاد تیم: کاربر می‌تواند حداکثر 3 تیم ایجاد کند
+        return $this->ownedTeams()->count() < 3;
     }
 }

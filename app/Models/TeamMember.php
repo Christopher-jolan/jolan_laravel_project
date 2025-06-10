@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class TeamMember extends Model
 {
@@ -11,9 +12,8 @@ class TeamMember extends Model
     protected $table = 'team_members';
 
     protected $fillable = [
-        'team_id',
-        'user_id',
-        'role'
+        'team_id', 'user_id', 'name', 
+        'student_number', 'email', 'phone', 'role'
     ];
 
     public function team()
