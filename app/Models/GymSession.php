@@ -20,7 +20,7 @@ class GymSession extends Model
         'repeat_weekly',
         'max_capacity',
         'current_capacity',
-        'status',
+        'status', // ['available', 'reserved', 'full', 'expired']
     ];
 
     public static function handleWeeklyRepeats()
@@ -28,9 +28,15 @@ class GymSession extends Model
         $now = Carbon::now();
         $today = $now->format('Y-m-d');
         
-        // پیدا کردن سانس‌های تکرارشونده که تاریخشان گذشته
         $expiredSessions = self::where('repeat_weekly', true)
-            ->whereDate('date', '<', $today)
+            ->where(function($query) use ($today, $now) {
+                $query->where('date', '<', $today)
+                    ->orWhere(function($q) use ($today, $now) {
+                        $q->where('date', $today)
+                            ->where('end_time', '<', $now->format('H:i:s'));
+                    });
+            })
+            ->where('status', '!=', 'expired')
             ->get();
 
         foreach ($expiredSessions as $session) {
@@ -47,8 +53,8 @@ class GymSession extends Model
                 'status' => 'available'
             ]);
             
-            // حذف سانس قدیمی
-            $session->delete();
+            // تغییر وضعیت سانس قدیمی به expired به جای حذف
+            $session->update(['status' => 'expired']);
         }
     }
 
@@ -62,6 +68,12 @@ class GymSession extends Model
             $this->status = 'available';
         }
         $this->save();
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('status', '!=', 'expired')
+                    ->where('date', '>=', now()->format('Y-m-d'));
     }
 
 

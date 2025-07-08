@@ -42,22 +42,78 @@
                     </div>
 
                     @if($reservation->team)
-                        <div class="alert alert-secondary">
-                            <h5><i class="bi bi-people-fill"></i> اطلاعات تیم:</h5>
-                            <p>نام تیم: {{ $reservation->team->name }}</p>
-                            <p>تعداد اعضای تیم: {{ $reservation->team->member_count }}</p>
+                        <div class="card mt-4">
+                            <div class="card-header bg-secondary text-white">
+                                <h5 class="mb-0">
+                                    <i class="bi bi-people-fill"></i> مدیریت تیم
+                                    <a href="{{ route('teams.show', $reservation->team->id) }}" 
+                                       class="btn btn-sm btn-outline-light float-left">
+                                        <i class="bi bi-arrow-left"></i> مشاهده کامل تیم
+                                    </a>
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <h6>نام تیم: {{ $reservation->team->name }}</h6>
+                                <p>تعداد اعضا: {{ $reservation->team->member_count }}</p>
+                                
+                                <h6 class="mt-4">اعضای تیم:</h6>
+                                <div class="table-responsive">
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>نام</th>
+                                                <th>شماره دانشجویی</th>
+                                                <th>نقش</th>
+                                                <th>عملیات</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($reservation->team->members as $member)
+                                            <tr>
+                                                <td>{{ $member->name }}</td>
+                                                <td>{{ $member->student_number }}</td>
+                                                <td>
+                                                    @if($member->role === 'leader')
+                                                        <span class="badge bg-primary">رهبر تیم</span>
+                                                    @else
+                                                        <span class="badge bg-secondary">عضو</span>
+                                                    @endif
+                                                </td>
+                                                <td>
+                                                    @if($member->role !== 'leader')
+                                                    <form action="{{ route('team-members.destroy', $member->id) }}" method="POST">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                                onclick="return confirm('آیا از حذف این عضو مطمئن هستید؟')">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                                
+                                <!-- دکمه افزودن عضو جدید -->
+                                <button class="btn btn-sm btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#addMemberModal">
+                                    <i class="bi bi-plus"></i> افزودن عضو جدید
+                                </button>
+                            </div>
                         </div>
                     @endif
 
                     @if($reservation->notes)
-                        <div class="alert alert-light">
+                        <div class="alert alert-light mt-4">
                             <h5><i class="bi bi-card-text"></i> توضیحات:</h5>
                             <p>{{ $reservation->notes }}</p>
                         </div>
                     @endif
 
                     <div class="d-flex justify-content-between mt-4">
-                        <a href="{{ route('reservations.index') }}" class="btn btn-outline-secondary">
+                        <a href="{{ route('home') }}" class="btn btn-outline-secondary">
                             <i class="bi bi-arrow-right"></i> بازگشت به لیست
                         </a>
 
@@ -94,4 +150,41 @@
         </div>
     </div>
 </div>
+
+<!-- Modal افزودن عضو جدید -->
+@if($reservation->team)
+<div class="modal fade" id="addMemberModal" tabindex="-1" aria-labelledby="addMemberModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addMemberModalLabel">افزودن عضو جدید</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ route('team-members.store') }}" method="POST">
+                @csrf
+                <input type="hidden" name="team_id" value="{{ $reservation->team->id }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">نام کامل</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="student_number" class="form-label">شماره دانشجویی</label>
+                        <input type="text" class="form-control" id="student_number" name="student_number" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">تلفن (اختیاری)</label>
+                        <input type="text" class="form-control" id="phone" name="phone">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">انصراف</button>
+                    <button type="submit" class="btn btn-primary">ذخیره</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endif
+
 @endsection

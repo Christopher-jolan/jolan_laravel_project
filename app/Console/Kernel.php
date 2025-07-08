@@ -7,13 +7,13 @@ use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
 class Kernel extends ConsoleKernel
 {
-    /**
-     * Define the application's command schedule.
-     */
+    
     protected function schedule(Schedule $schedule)
     {
-        // زمانبندی پردازش سانس‌های هفتگی
-        $schedule->job(new \App\Jobs\ProcessWeeklySessions)->dailyAt('00:05');
+        
+        $schedule->job(new \App\Jobs\HandleExpiredGymSessions)->everyMinute();
+        
+        $schedule->job(new \App\Jobs\UpdateAnnouncementsStatus)->everyMinute();
     }
 
     /**

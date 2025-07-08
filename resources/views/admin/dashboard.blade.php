@@ -106,29 +106,31 @@
                     </thead>
                     <tbody>
                         @foreach($sessions as $session)
-                        <tr>
-                            <td>{{ $session->date }}</td>
-                            <td>{{ $session->start_time }} - {{ $session->end_time }}</td>
-                            <td>{{ $session->reserved_count }}/{{ $session->max_capacity }}</td>
-                            <td>
-                                @if($session->status === 'available')
-                                    <span class="badge bg-success">موجود</span>
-                                @elseif($session->status === 'full')
-                                    <span class="badge bg-danger">تکمیل</span>
-                                @else
-                                    <span class="badge bg-warning">رزرو شده</span>
-                                @endif
-                            </td>
-                            <td>
-                                <form action="{{ route('admin.sessions.delete', $session->id) }}" method="POST" class="d-inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('آیا مطمئن هستید؟')">
-                                        <i class="bi bi-trash"></i> حذف
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
+                            @if($session->status !== 'expired')
+                                <tr>
+                                    <td>{{ $session->date }}</td>
+                                    <td>{{ $session->start_time }} - {{ $session->end_time }}</td>
+                                    <td>{{ $session->reserved_count }}/{{ $session->max_capacity }}</td>
+                                    <td>
+                                        @if($session->status === 'available')
+                                            <span class="badge bg-success">موجود</span>
+                                        @elseif($session->status === 'full')
+                                            <span class="badge bg-danger">تکمیل</span>
+                                        @else
+                                            <span class="badge bg-warning">رزرو شده</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <form action="{{ route('admin.sessions.delete', $session->id) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('آیا مطمئن هستید؟')">
+                                                <i class="bi bi-trash"></i> حذف
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @endif
                         @endforeach
                     </tbody>
                 </table>
@@ -144,17 +146,31 @@
         <div class="card-body">
             <form action="{{ route('admin.announcements.add') }}" method="POST" class="mb-4">
                 @csrf
-                <div class="mb-3">
-                    <label class="form-label">عنوان</label>
-                    <input type="text" name="title" class="form-control" required>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">عنوان</label>
+                        <input type="text" name="title" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">متن اطلاعیه</label>
+                        <input type="text" name="content" class="form-control" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">زمان شروع</label>
+                        <input type="datetime-local" name="start_time" class="form-control" 
+                            value="{{ now()->format('Y-m-d\TH:i') }}" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">زمان پایان</label>
+                        <input type="datetime-local" name="end_time" class="form-control" 
+                            value="{{ now()->addWeek()->format('Y-m-d\TH:i') }}" required>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-plus"></i> افزودن اطلاعیه
+                        </button>
+                    </div>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label">متن اطلاعیه</label>
-                    <textarea name="content" class="form-control" rows="3" required></textarea>
-                </div>
-                <button type="submit" class="btn btn-success">
-                    <i class="bi bi-plus"></i> افزودن اطلاعیه
-                </button>
             </form>
 
             <h4 class="mb-3">لیست اطلاعیه‌ها</h4>
@@ -162,7 +178,18 @@
             <div class="card mb-3">
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
-                        <h5>{{ $announcement->title }}</h5>
+                        <div>
+                            <h5>{{ $announcement->title }}
+                                <span class="badge bg-{{ $announcement->is_active ? 'success' : 'secondary' }}">
+                                    {{ $announcement->is_active ? 'فعال' : 'غیرفعال' }}
+                                </span>
+                            </h5>
+                            <p>{{ $announcement->content }}</p>
+                            <small class="text-muted">
+                                نمایش از: {{ jdate($announcement->start_time)->format('Y/m/d H:i') }} تا 
+                                {{ jdate($announcement->end_time)->format('Y/m/d H:i') }}
+                            </small>
+                        </div>
                         <form action="{{ route('admin.announcements.delete', $announcement->id) }}" method="POST">
                             @csrf
                             @method('DELETE')
@@ -171,10 +198,6 @@
                             </button>
                         </form>
                     </div>
-                    <p>{{ $announcement->content }}</p>
-                    <small class="text-muted">
-                        ایجاد شده در: {{ $announcement->created_at }}
-                    </small>
                 </div>
             </div>
             @endforeach

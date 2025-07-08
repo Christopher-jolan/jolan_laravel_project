@@ -21,12 +21,9 @@ class AdminController extends Controller
 
     public function dashboard()
     {
-        $pendingReservations = Reservation::with(['user', 'gymSession'])
-            ->where('status', 'pending')
-            ->get();
-
-        $sessions = GymSession::all();
-        $announcements = Announcement::with('creator')->latest()->get();
+        $pendingReservations = Reservation::where('status', 'pending')->get();
+        $sessions = GymSession::active()->get();
+        $announcements = Announcement::latest()->get();
 
         return view('admin.dashboard', compact(
             'pendingReservations',
@@ -86,21 +83,32 @@ class AdminController extends Controller
     }
 
     public function addAnnouncement(Request $request)
-    {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'required'
-        ]);
+        {
+            $validated = $request->validate([
+                'title' => 'required|string|max:255',
+                'content' => 'required|string',
+                'start_time' => 'required|date',
+                'end_time' => 'required|date|after:start_time',
+            ]);
 
-        Announcement::create([
-            'title' => $request->title,
-            'content' => $request->content,
-            'created_by' => auth()->id
-        ]);
+            Announcement::create([
+                'title' => $validated['title'],
+                'content' => $validated['content'],
+                'start_time' => $validated['start_time'],
+                'end_time' => $validated['end_time'],
+                'is_active' => Carbon::now()->between($validated['start_time'], $validated['end_time']),
+                'created_by' => auth()->id(),
+            ]);
 
-        return back()->with('success', 'اطلاعیه جدید با موفقیت اضافه شد');
-    }
+            return redirect()->back()->with('success', 'اطلاعیه با موفقیت اضافه شد.');
+        }
 
+        public function getAnnouncements()
+        {
+            return Announcement::active()
+                ->orderBy('start_time', 'desc')
+                ->get();
+        }
     public function deleteAnnouncement($id)
     {
         $announcement = Announcement::findOrFail($id);

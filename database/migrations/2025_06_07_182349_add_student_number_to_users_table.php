@@ -1,4 +1,4 @@
-<?php
+ <?php
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -12,21 +12,17 @@ return new class extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            if (!Schema::hasColumn('users', 'student_number')) {
-                $table->string('student_number')->after('email');
-            }
+            $table->string('student_number')->nullable()->change();
         });
     }
 
     /**
      * Reverse the migrations.
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            if (Schema::hasColumn('users', 'student_number')) {
-                $table->dropColumn('student_number');
-            }
+            $table->string('student_number')->default('0000000000')->change();
         });
     }
 };

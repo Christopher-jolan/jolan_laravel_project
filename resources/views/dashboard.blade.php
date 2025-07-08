@@ -35,16 +35,27 @@
                                     
                                     <div class="row mt-3">
                                         <div class="col-md-4">
-                                            <p><i class="bi bi-people"></i> تعداد اعضا: {{ $reservation->member_count }}/{{ $reservation->gymSession->max_capacity }}</p>
+                                            <p><i class="bi bi-people"></i> تعداد اعضا: {{ $reservation->member_count }}</p>
                                         </div>
                                         <div class="col-md-4">
                                             @if($reservation->team)
                                                 <p><i class="bi bi-tag"></i> تیم: {{ $reservation->team->name }}</p>
                                             @endif
                                         </div>
-                                        <div class="col-md-4">
-                                            <p><i class="bi bi-info-circle"></i> وضعیت سانس: {{ $reservation->gymSession->status === 'full' ? 'تکمیل ظرفیت' : 'ظرفیت موجود' }}</p>
-                                        </div>
+                                    </div>
+
+                                    <div class="mt-3">
+                                        <a href="{{ route('reservations.show', $reservation->id) }}" 
+                                           class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-eye"></i> مشاهده جزئیات
+                                        </a>
+                                        
+                                        @if($reservation->team)
+                                            <a href="{{ route('teams.show', $reservation->team->id) }}" 
+                                               class="btn btn-sm btn-outline-secondary">
+                                                <i class="bi bi-people"></i> مدیریت تیم
+                                            </a>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -147,10 +158,6 @@
                                         <p class="mb-1">
                                             <i class="bi bi-people"></i> 
                                             ظرفیت: {{ $request->reservation->member_count }}/{{ $request->reservation->gymSession->max_capacity }}
-                                        </p>
-                                        <p class="mb-0">
-                                            <i class="bi bi-info-circle"></i> 
-                                            وضعیت سانس: {{ $request->reservation->gymSession->status === 'full' ? 'تکمیل ظرفیت' : 'ظرفیت موجود' }}
                                         </p>
                                     </div>
                                 </div>

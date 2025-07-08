@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
@@ -9,27 +8,39 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <style>
         :root {
-            --primary-color: #1a4b7a;
-            --secondary-color: #2c7da0;
-            --accent-color: #61a5c2;
+            --primary-color: #102542; /* Dark Blue */
+            --secondary-color: #f87060; /* Desert Sand */
+            --accent-color: #cdd7d6; 
             --light-color: #f8f9fa;
             --dark-color: #212529;
             --success-color: #2a9d8f;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --body-bg: #f5f5f5;
+        }
+
+        [data-theme="dark"] {
+            --primary-color: #102542;
+            --secondary-color: #f87060;
+            --accent-color: #3a3846;
+            --light-color: #2d2b3a;
+            --dark-color: #e0e0e0;
+            --success-color: #28a745;
+            --card-bg: #2d2b3a;
+            --text-color: #e0e0e0;
+            --body-bg: #1a1824;
         }
         
         body {
             font-family: 'B Nazanin', Arial, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ed 100%);
+            background-color: var(--body-bg);
+            color: var(--text-color);
             margin: 0;
             padding: 0;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            background-image: url('{{ asset("images/volleyball-wallpaper-3.jpg") }}');
-            background-size: 100vw 46vw;
-            background-repeat: no-repeat;
-            /* background-attachment: fixed; */
-            background-position: center;
+            transition: all 0.3s ease;
         }
         
         .auth-container {
@@ -43,10 +54,11 @@
         .auth-card {
             width: 100%;
             max-width: 500px;
-            background: white;
+            background-color: var(--card-bg);
             border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             overflow: hidden;
+            transition: all 0.3s ease;
         }
         
         .auth-header {
@@ -66,11 +78,13 @@
             margin-bottom: 15px;
             border: 1px solid #ddd;
             transition: all 0.3s;
+            background-color: var(--card-bg);
+            color: var(--text-color);
         }
         
         .form-control:focus {
-            border-color: var(--accent-color);
-            box-shadow: 0 0 0 0.25rem rgba(97, 165, 194, 0.25);
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 0.25rem rgba(248, 112, 96, 0.25);
         }
         
         .btn-primary {
@@ -92,19 +106,20 @@
         .auth-footer {
             text-align: center;
             padding: 15px;
-            background-color: #f8f9fa;
-            border-top: 1px solid #eee;
+            background-color: var(--light-color);
+            border-top: 1px solid var(--accent-color);
         }
         
         .auth-footer a {
-            color: var(--primary-color);
+            color: var(--secondary-color);
             text-decoration: none;
             font-weight: bold;
         }
         
         .input-group-text {
-            background-color: #e9ecef;
+            background-color: var(--accent-color);
             border: 1px solid #ddd;
+            color: var(--text-color);
         }
         
         .password-toggle {
@@ -113,7 +128,7 @@
             left: 15px;
             transform: translateY(-50%);
             cursor: pointer;
-            color: #6c757d;
+            color: var(--text-muted);
         }
         
         .validation-error {
@@ -126,29 +141,77 @@
         
         .login-method-tabs {
             margin-bottom: 20px;
-            border-bottom: 1px solid #dee2e6;
+            border-bottom: 1px solid var(--accent-color);
         }
         
         .login-method-tabs .nav-link {
-            color: #495057;
+            color: var(--text-color);
             font-weight: bold;
             border: none;
             padding: 10px 20px;
         }
         
         .login-method-tabs .nav-link.active {
-            color: var(--primary-color);
+            color: var(--secondary-color);
             background-color: transparent;
-            border-bottom: 3px solid var(--primary-color);
+            border-bottom: 3px solid var(--secondary-color);
         }
         
         .login-method-tabs .nav-link:hover:not(.active) {
             color: var(--secondary-color);
         }
         
+        .theme-switcher {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 1000;
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .back-to-home {
+            position: fixed;
+            bottom: 80px;
+            left: 20px;
+            z-index: 1000;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            text-decoration: none;
+        }
+        
         @media (max-width: 576px) {
             .auth-card {
                 border-radius: 0;
+            }
+            
+            .theme-switcher, .back-to-home {
+                bottom: 10px;
+                left: 10px;
+                width: 40px;
+                height: 40px;
+            }
+            
+            .back-to-home {
+                bottom: 60px;
             }
         }
     </style>
@@ -254,6 +317,16 @@
         </div>
     </div>
 
+    <!-- دکمه بازگشت به خانه -->
+    <a href="{{ route('home') }}" class="back-to-home" title="بازگشت به صفحه اصلی">
+        <i class="bi bi-house-door"></i>
+    </a>
+
+    <!-- دکمه تغییر تم -->
+    <button class="theme-switcher" id="themeSwitcher">
+        <i class="bi bi-moon-stars" id="themeIcon"></i>
+    </button>
+
     <script>
         function togglePassword(id) {
             const input = document.getElementById(id);
@@ -277,6 +350,29 @@
                 phoneTab.show();
             });
         @endif
+
+        // تغییر تم
+        const themeSwitcher = document.getElementById('themeSwitcher');
+        const themeIcon = document.getElementById('themeIcon');
+        const body = document.body;
+        
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        if (currentTheme === 'dark') {
+            body.setAttribute('data-theme', 'dark');
+            themeIcon.className = 'bi bi-sun';
+        }
+        
+        themeSwitcher.addEventListener('click', () => {
+            if (body.getAttribute('data-theme') === 'dark') {
+                body.removeAttribute('data-theme');
+                themeIcon.className = 'bi bi-moon-stars';
+                localStorage.setItem('theme', 'light');
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                themeIcon.className = 'bi bi-sun';
+                localStorage.setItem('theme', 'dark');
+            }
+        });
     </script>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

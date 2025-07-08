@@ -53,8 +53,6 @@ class Reservation extends Model
 
     public function getMembersCountAttribute()
     {
-        // اگر تیم دارد تعداد اعضای تیم را برگردان
-        // اگر تیم ندارد (رزرو انفرادی) عدد 1 را برگردان
         return $this->team ? $this->team->member_count : 1;
     }
 }
