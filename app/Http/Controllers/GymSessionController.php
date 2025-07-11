@@ -14,7 +14,7 @@ class GymSessionController extends Controller
     public function index()
     {
         $gymSessions = GymSession::with(['reservations.team.members'])
-            ->active() // استفاده از اسکوپ active
+            ->active()
             ->where('status', '!=', 'full')
             ->orderBy('date')
             ->orderBy('start_time')
